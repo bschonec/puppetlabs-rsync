@@ -15,6 +15,8 @@ class rsync::server(
   $uid        = 'nobody',
   $gid        = 'nobody',
   $modules    = {},
+  $rsyncd_ensure = 'running',
+  $rsyncd_enable = true,
 ) inherits rsync {
 
   case $facts['os']['family'] {
@@ -60,8 +62,8 @@ class rsync::server(
     }
 
     service { $servicename:
-      ensure     => running,
-      enable     => true,
+      ensure     => $rsyncd_ensure,
+      enable     => $rsyncd_enable,
       hasstatus  => true,
       hasrestart => true,
       subscribe  => Concat[$conf_file],
