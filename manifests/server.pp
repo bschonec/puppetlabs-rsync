@@ -23,24 +23,24 @@ class rsync::server(
       bind        => $address,
       port        => '873',
       server      => '/usr/bin/rsync',
-      server_args => "--daemon --config ${conf_file}",
+      server_args => "--daemon --config ${rsync::conf_file}",
       require     => Package['rsync'],
     }
   } else {
 
-    if ($rsyncd_package_name) {
-      package {$rsyncd_package_name:
+    if ($rsync::rsyncd_package_name) {
+      package {$rsync::rsyncd_package_name:
         ensure => $rsync::package_ensure,
-        notify => Service[$servicename],
+        notify => Service[$rsync::servicename],
       }
     }
 
-    service { $servicename:
+    service { $rsync::servicename:
       ensure     => running,
       enable     => true,
       hasstatus  => true,
       hasrestart => true,
-      subscribe  => Concat[$conf_file],
+      subscribe  => Concat[$rsync::conf_file],
     }
 
     if ( $facts['os']['family'] == 'Debian' ) {
@@ -57,14 +57,14 @@ class rsync::server(
     }
   }
 
-  concat { $conf_file: }
+  concat { $rsync::conf_file: }
 
   # Template uses:
   # - $use_chroot
   # - $address
   # - $motd_file
   concat::fragment { 'rsyncd_conf_header':
-    target  => $conf_file,
+    target  => $rsync::conf_file,
     content => template('rsync/header.erb'),
     order   => '00_header',
   }
