@@ -17,29 +17,6 @@ class rsync::server(
   $modules    = {},
 ) inherits rsync {
 
-  case $facts['os']['family'] {
-    'Debian': {
-      $conf_file = '/etc/rsyncd.conf'
-      $servicename = 'rsync'
-    }
-    'Suse': {
-      $conf_file = '/etc/rsyncd.conf'
-      $servicename = 'rsyncd'
-    }
-    'RedHat': {
-      $conf_file = '/etc/rsyncd.conf'
-      $servicename = 'rsyncd'
-    }
-    'FreeBSD': {
-      $conf_file = '/usr/local/etc/rsync/rsyncd.conf'
-      $servicename = 'rsyncd'
-    }
-    default: {
-      $conf_file = '/etc/rsync.conf'
-      $servicename = 'rsync'
-    }
-  }
-
   if $use_xinetd {
     include xinetd
     xinetd::service { 'rsync':
@@ -50,10 +27,9 @@ class rsync::server(
       require     => Package['rsync'],
     }
   } else {
-    if ($facts['os']['family'] == 'RedHat') and
-        (Integer($facts['os']['release']['major']) >= 8) and
-        ($rsync::manage_package) {
-      package { 'rsync-daemon':
+
+    if ($rsyncd_package_name) {
+      package {$rsyncd_package_name:
         ensure => $rsync::package_ensure,
         notify => Service[$servicename],
       }
