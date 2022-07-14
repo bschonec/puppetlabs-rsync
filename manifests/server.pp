@@ -7,20 +7,20 @@
 #   class rsync
 #
 class rsync::server(
-  Boolean                                    $use_xinetd = true,
-  $address                                               = '0.0.0.0',
-  $motd_file                                             = 'UNSET',
-  Variant[Enum['UNSET'], Stdlib::Absolutepath] $pid_file = '/var/run/rsyncd.pid',
-  $use_chroot                                            = 'yes',
-  $uid                                                   = 'nobody',
-  $gid                                                   = 'nobody',
-  $modules                                               = {},
-  Optional[String[1]]                      $package_name = undef,
-  String[1]                                   $conf_file = '/etc/rsync.conf',
-  String[1]                                 $servicename = 'rsync',
-  Stdlib::Ensure::Service                $service_ensure = 'running',
-  Boolean                                $service_enable = true,
-  Boolean                                $manage_package = $rsync::manage_package,
+  Boolean                                       $use_xinetd = true,
+  $address                                                  = '0.0.0.0',
+  $motd_file                                                = 'UNSET',
+  Variant[Enum['UNSET'], Stdlib::Absolutepath]    $pid_file = '/var/run/rsyncd.pid',
+  $use_chroot                                               = 'yes',
+  $uid                                                      = 'nobody',
+  $gid                                                      = 'nobody',
+  $modules                                                  = {},
+  Optional[String[1]]                         $package_name = undef,
+  String[1]                                      $conf_file = '/etc/rsync.conf',
+  String[1]                                    $servicename = 'rsync',
+  Stdlib::Ensure::Service                   $service_ensure = 'running',
+  Variant[Boolean, Enum['mask', 'unmask']]] $service_enable = true,
+  Boolean                                   $manage_package = $rsync::manage_package,
 ) inherits rsync {
 
   if $use_xinetd {
