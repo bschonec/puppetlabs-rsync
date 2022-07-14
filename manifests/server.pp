@@ -19,7 +19,7 @@ class rsync::server(
   String[1]                                      $conf_file = '/etc/rsync.conf',
   String[1]                                    $servicename = 'rsync',
   Stdlib::Ensure::Service                   $service_ensure = 'running',
-  Variant[Enum['mask'], Boolean]            $service_enable = 'mask',
+  Variant[Enum['mask'], Boolean]            $service_enable = true,
   $package_ensure                                           = $rsync::package_ensure,
   Boolean                                   $manage_package = $rsync::manage_package,
 ) inherits rsync {
