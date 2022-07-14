@@ -19,9 +19,17 @@ class rsync::server(
   String[1]                                      $conf_file = '/etc/rsync.conf',
   String[1]                                    $servicename = 'rsync',
   Stdlib::Ensure::Service                   $service_ensure = 'running',
-  Variant[Boolean, Enum['mask', 'unmask']]] $service_enable = true,
+  Variant[Boolean, Enum['mask']]            $service_enable = true,
+  $package_ensure                                           = $rsync::package_ensure,
   Boolean                                   $manage_package = $rsync::manage_package,
 ) inherits rsync {
+
+  # RHEL8 and newer have a separate package for rsyncd daemon.  If we're trying to remove the 
+  # rsyncd package on RHEL7 or older, signal an error since the rsync client and rsync daemon
+  # are provided by the same package.
+  if $facts[os][family] == 'RedHat' and (versioncmp($facts['os']['release']['major'], '8') < 0) and $package_ensure == 'absent' {
+    fail("Unable to remove rsyncd package since that would also remove the rsync client package.")
+  }
 
   if $use_xinetd {
     include xinetd
@@ -41,7 +49,7 @@ class rsync::server(
       # variable is defined (the variable is defined in the hiera hierarchy), then install the package.
       if $package_name {
         package {$package_name:
-          ensure => $rsync::package_ensure,
+          ensure => $package_ensure,
           notify => Service[$servicename],
         }
       }
